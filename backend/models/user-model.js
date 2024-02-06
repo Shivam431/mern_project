@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
         require:true
     },
     phone:{
-        type:Number,
+        type:String,
         require:true
     },
     isAdmin:{
@@ -55,6 +55,17 @@ userSchema.methods.generateToken = async function(){
     },process.env.TOKEN_SECRET_KEY,{expiresIn:"30d"})
 }
 
+
+//compare password for login
+userSchema.methods.comparePassword = async function(password,next){
+    try {
+        // console.log(password)
+        // console.log(this.password)
+        return bcrypt.compare(password,this.password)
+    } catch (error) {
+        next(error)
+    }
+}
 //define model/collection of name User
 const User= new mongoose.model("User",userSchema);
 

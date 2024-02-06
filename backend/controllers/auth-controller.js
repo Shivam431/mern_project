@@ -1,5 +1,6 @@
 const User = require("../models/user-model");
-const bcrypt = require("bcryptjs");
+const Contact = require("../models/contact-model")
+// const bcrypt = require("bcryptjs");
 
 const home = async (req, res) => {
   try {
@@ -10,7 +11,7 @@ const home = async (req, res) => {
   }
 };
 
-const register = async (req, res) => {
+const register = async (req, res,next) => {
   try {
     // console.log(req.body)
     const { username, email, password, phone, isAdmin } = req.body;
@@ -33,7 +34,8 @@ const register = async (req, res) => {
       userID: userCreated._id.toString(),
     });
   } catch (error) {
-    console.log(error);
+    // console.log("internal server error");
+    next(error)
   }
 };
 
@@ -47,7 +49,9 @@ const login = async (req, res) => {
       return res.status(400).json({ msg: "INVALID CREDENTIALS" });
     }
 
-    const isValid = await bcrypt.compare(password, userExist.password);
+    // const isValid = await bcrypt.compare(password, userExist.password);
+
+    const isValid = await userExist.comparePassword(password);
 
     if (isValid) {
       res.status(200).json({
@@ -63,4 +67,28 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { home, register, login };
+
+const contact = async(req,res,next)=>{
+  try {
+    const {username,email,message} = req.body;
+
+    const userExist = await User.findOne({email:email})
+    if(!userExist){
+     return res.status(404).json({msg:"user not found"})
+    }
+    const contactDetails = await Contact.create({
+      username,
+      email,
+      message
+    });
+
+    res.status(200).json({
+      userID: contactDetails._id.toString(),
+    });
+
+  } catch (error) {
+    next(error)
+  }
+
+}
+module.exports = { home, register, login, contact };
