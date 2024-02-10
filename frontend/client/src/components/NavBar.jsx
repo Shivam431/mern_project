@@ -20,7 +20,7 @@ export const NavBar = () => {
               <NavLink to="/contact">Contact</NavLink>
             </li>
             <li>
-              <NavLink to="/services">Services</NavLink>
+              <NavLink to="/service">Services</NavLink>
             </li>
             <li>
               <NavLink to="/login">Login</NavLink>

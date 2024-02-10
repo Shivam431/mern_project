@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useAuth } from "../store/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export const RegisterForm = () => {
   const [user, setUser] = useState({
@@ -8,6 +10,9 @@ export const RegisterForm = () => {
     password: "",
   });
 
+  const { setToken } = useAuth();
+
+  const navigate= useNavigate();
   const handleInput = (e) => {
     console.log(e);
     let name = e.target.name;
@@ -20,9 +25,34 @@ export const RegisterForm = () => {
   };
 
   // handle form on submit
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(user);
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      const response = await fetch("http://localhost:3000/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (response.ok) {
+        setUser({
+          username: "",
+          email: "",
+          phone: "",
+          password: "",
+        });
+        const data = await response.json();
+        // console.log(data)
+        setToken(data.token);
+        navigate('/login')
+      }
+      // console.log(response);
+    } catch (error) {
+      console.log("error " + error);
+    }
+    // console.log(user);
   };
 
   //  Help me reach 1 Million subs 👉 https://youtube.com/thapatechnical
